@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 
@@ -30,12 +31,13 @@ func main() {
 		Image: "alpine",
 		Cmd:   []string{"echo", "hello world"},
 		Tty:   false,
-	}, nil, nil, nil, "")
+	}, nil, nil, nil, "test")
 	if err != nil {
 		panic(err)
 	}
 
 	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+
 		panic(err)
 	}
 
@@ -54,4 +56,10 @@ func main() {
 	}
 
 	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
+
+	fmt.Println(resp.ID)
+
+	if err = cli.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{}); err != nil {
+		panic(err)
+	}
 }
