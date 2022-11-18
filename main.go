@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 
@@ -13,6 +12,14 @@ import (
 )
 
 func main() {
+	dockerID := DockerCreate()
+	DockerStart(dockerID)
+	DockerLogs(dockerID)
+	DockerRemove(dockerID)
+
+}
+
+func DockerCreate() string {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -36,12 +43,21 @@ func main() {
 		panic(err)
 	}
 
-	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+	return resp.ID
+}
 
+func DockerStart(containerID string) {
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
 		panic(err)
 	}
 
-	statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
+	if err := cli.ContainerStart(ctx, containerID, types.ContainerStartOptions{}); err != nil {
+		panic(err)
+	}
+
+	statusCh, errCh := cli.ContainerWait(ctx, containerID, container.WaitConditionNotRunning)
 	select {
 	case err := <-errCh:
 		if err != nil {
@@ -49,17 +65,31 @@ func main() {
 		}
 	case <-statusCh:
 	}
+}
 
-	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
+func DockerLogs(containerID string) {
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		panic(err)
+	}
+
+	out, err := cli.ContainerLogs(ctx, containerID, types.ContainerLogsOptions{ShowStdout: true})
 	if err != nil {
 		panic(err)
 	}
 
 	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
+}
 
-	fmt.Println(resp.ID)
+func DockerRemove(containerID string) {
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		panic(err)
+	}
 
-	if err = cli.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{}); err != nil {
+	if err = cli.ContainerRemove(ctx, containerID, types.ContainerRemoveOptions{}); err != nil {
 		panic(err)
 	}
 }
