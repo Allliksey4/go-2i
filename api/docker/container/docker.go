@@ -2,15 +2,28 @@ package container
 
 import (
 	"context"
+	"io"
+	"os"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
-	"io"
-	"os"
+	apiDocker "go-2i/api/docker"
 )
 
-func Create() string {
+type Wrapper interface {
+    Create()
+	Start(dockerID string)
+	Logs(dockerID string)
+	Remove(dockerID string)
+}
+
+func New() *apiDocker.Container {
+	return &apiDocker.Container{}
+}
+
+func (с *apiDocker.Container) Create() string {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -37,10 +50,10 @@ func Create() string {
 	return resp.ID
 }
 
-func Start(containerID string) {
+func (с *apiDocker.Container) Start(containerID string) {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
+	if err != nil (с docker.Container){
 		panic(err)
 	}
 
@@ -58,7 +71,7 @@ func Start(containerID string) {
 	}
 }
 
-func Logs(containerID string) {
+func (с *apiDocker.Container) Logs(containerID string) {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -73,7 +86,7 @@ func Logs(containerID string) {
 	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 }
 
-func Remove(containerID string) {
+func (с *apiDocker.Container) Remove(containerID string) {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
