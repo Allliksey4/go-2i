@@ -1,12 +1,12 @@
 package main
 
 import (
-	"go-2i/api/docker"
+	dockerContainer "go-2i/api/docker/container"
 )
 
 func main() {
-	dockerID := docker.DockerCreate()
-	docker.DockerStart(dockerID)
-	docker.DockerLogs(dockerID)
-	docker.DockerRemove(dockerID)
+	dockerID := dockerContainer.Create()
+	dockerContainer.Start(dockerID)
+	dockerContainer.Logs(dockerID)
+	dockerContainer.Remove(dockerID)
 }

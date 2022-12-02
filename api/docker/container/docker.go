@@ -1,4 +1,4 @@
-package docker
+package container
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-func DockerCreate() string {
+func Create() string {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -37,7 +37,7 @@ func DockerCreate() string {
 	return resp.ID
 }
 
-func DockerStart(containerID string) {
+func Start(containerID string) {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -58,7 +58,7 @@ func DockerStart(containerID string) {
 	}
 }
 
-func DockerLogs(containerID string) {
+func Logs(containerID string) {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -73,7 +73,7 @@ func DockerLogs(containerID string) {
 	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 }
 
-func DockerRemove(containerID string) {
+func Remove(containerID string) {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
